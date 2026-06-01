@@ -39,6 +39,12 @@ foreach ($line in (Invoke-GitLines @("ls-files"))) {
 foreach ($line in (Invoke-GitLines @("diff", "--cached", "--name-only"))) {
     if ($line) { [void]$files.Add(($line -replace '\\', '/')) }
 }
+$stagedDeletes = New-Object System.Collections.Generic.HashSet[string]
+foreach ($line in (Invoke-GitLines @("diff", "--cached", "--name-status"))) {
+    if ($line -match '^D\s+(.+)$') {
+        [void]$stagedDeletes.Add(($matches[1] -replace '\\', '/'))
+    }
+}
 if ($ScanUntracked) {
     foreach ($line in (Invoke-GitLines @("ls-files", "--others", "--exclude-standard"))) {
         if ($line) { [void]$files.Add(($line -replace '\\', '/')) }
@@ -49,6 +55,9 @@ $failures = New-Object System.Collections.Generic.List[string]
 
 foreach ($relative in $files) {
     if ($relative -match $blockedPathPattern) {
+        if ($stagedDeletes.Contains($relative)) {
+            continue
+        }
         $failures.Add("Blocked tracked/staged path: $relative")
         continue
     }

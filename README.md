@@ -82,6 +82,8 @@ powershell D:\devtools\health-check.ps1
 
 Slots require `AGENTMEMORY_SLOTS=true` at service startup. If `memory_slot_list` returns HTTP 500 while the rest of agentmemory is healthy, restart the service with that environment flag; until then, coordinate through normal memory, signals, actions, checkpoints, git state, and explicit context packs.
 
+`health-check.ps1` also checks `/agentmemory/mcp/tools`. A healthy workstation should expose the full server-backed MCP tool surface; a tiny tool count means the MCP client has likely fallen back to standalone mode.
+
 ## Public-Safety Rules
 
 Do not commit:
@@ -118,6 +120,8 @@ The pre-push hook is intentionally installed locally rather than tracked as `.gi
 For rotation steps, see [`docs/credential-rotation-runbook.md`](docs/credential-rotation-runbook.md).
 
 For agent collaboration examples, see [`examples/agentmemory-coordination.md`](examples/agentmemory-coordination.md).
+
+For the upstream agentmemory and mem0 mapping, see [`docs/upstream-memory-systems-map.md`](docs/upstream-memory-systems-map.md).
 
 For the private/public split, see [`docs/private-devtools-hygiene.md`](docs/private-devtools-hygiene.md).
 

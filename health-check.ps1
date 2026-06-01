@@ -54,9 +54,28 @@ function Test-AgentMemoryEnginePath {
     $script:errors += "iii.exe is not running from D:\devtools\npm-global"
 }
 
+function Test-AgentMemoryMcpTools {
+    Write-Host -NoNewline "agentmemory MCP proxy tools... "
+    try {
+        $result = Invoke-RestMethod -Uri "http://localhost:3111/agentmemory/mcp/tools" -Method Get -TimeoutSec 8
+        $count = @($result.tools).Count
+        if ($count -ge 40) {
+            Write-Host "OK ($count tools)" -ForegroundColor Green
+            return
+        }
+        Write-Host "FAIL ($count tools)" -ForegroundColor Red
+        $script:errors += "agentmemory MCP proxy exposed only $count tools; likely standalone fallback instead of full server proxy"
+        return
+    } catch {
+        Write-Host "FAIL" -ForegroundColor Red
+        $script:errors += "agentmemory MCP proxy tools endpoint failed: $($_.Exception.Message)"
+    }
+}
+
 Test-Port -Name "agentmemory" -Port 3111 -Required
 Test-Port -Name "agentmemory viewer" -Port 3113
 Test-AgentMemorySlots
+Test-AgentMemoryMcpTools
 Test-AgentMemoryEnginePath
 Test-Port -Name "PixelCat for Claude" -Port 8990 -Required
 Test-Port -Name "key rotator" -Port 9100
