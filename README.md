@@ -35,7 +35,7 @@ This is not a full copy of a machine. It intentionally excludes private agent ho
 
 | Path | Purpose |
 | --- | --- |
-| `agentmemory-server.ps1` / `.cmd` | Starts local agentmemory with all tools and slots enabled on demand. |
+| `agentmemory-server.ps1` / `.cmd` | Starts local agentmemory from `D:\devtools\npm-global` with all tools and slots enabled on demand. |
 | `health-check.ps1` | Read-only infrastructure check for agentmemory, launchers, D-drive junctions, and skill paths. |
 | `codex-health.ps1` | Read-only performance and process-family report. |
 | `codex-agent-report.ps1` | Read-only long-lived agent/process triage with command-line redaction. |
@@ -56,16 +56,23 @@ Agent Hub is retired and is not part of the active architecture.
 ## Quick Start
 
 1. Install `agentmemory` using its upstream instructions.
-2. Put this repository at `D:\devtools-public` or copy the scripts you want into `D:\devtools`.
-3. Copy `examples/devtools.local.example.cmd` to an ignored local file such as `D:\devtools\devtools.local.cmd`.
-4. Set only the environment variables you actually use.
-5. Start memory:
+2. Prefer a D-drive install for local agent packages:
+
+```powershell
+npm install -g @agentmemory/agentmemory --prefix D:\devtools\npm-global --cache D:\devtools\npm-cache
+```
+
+3. Ensure the pinned `iii.exe` engine used by agentmemory is on D-drive, for example `D:\devtools\npm-global\iii.exe`, and first in PATH when the server starts.
+4. Put this repository at `D:\devtools-public` or copy the scripts you want into `D:\devtools`.
+5. Copy `examples/devtools.local.example.cmd` to an ignored local file such as `D:\devtools\devtools.local.cmd`.
+6. Set only the environment variables you actually use.
+7. Start memory:
 
 ```powershell
 powershell D:\devtools\agentmemory-server.ps1
 ```
 
-6. Run a read-only check:
+8. Run a read-only check:
 
 ```powershell
 powershell D:\devtools\health-check.ps1

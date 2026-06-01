@@ -40,9 +40,24 @@ function Test-AgentMemorySlots {
     $script:errors += "agentmemory slots endpoint failed; restart with AGENTMEMORY_SLOTS=true"
 }
 
+function Test-AgentMemoryEnginePath {
+    Write-Host -NoNewline "agentmemory iii engine path... "
+    $engine = Get-CimInstance Win32_Process |
+        Where-Object { $_.Name -eq "iii.exe" -and $_.CommandLine -like "D:\devtools\npm-global\iii.exe*" } |
+        Select-Object -First 1
+    if ($engine) {
+        Write-Host "OK" -ForegroundColor Green
+        return
+    }
+
+    Write-Host "FAIL" -ForegroundColor Red
+    $script:errors += "iii.exe is not running from D:\devtools\npm-global"
+}
+
 Test-Port -Name "agentmemory" -Port 3111 -Required
 Test-Port -Name "agentmemory viewer" -Port 3113
 Test-AgentMemorySlots
+Test-AgentMemoryEnginePath
 Test-Port -Name "PixelCat for Claude" -Port 8990 -Required
 Test-Port -Name "key rotator" -Port 9100
 
