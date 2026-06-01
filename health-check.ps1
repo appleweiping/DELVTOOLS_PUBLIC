@@ -26,9 +26,24 @@ function Test-Port($Name, $Port, [switch]$Required) {
     }
 }
 
+function Test-AgentMemorySlots {
+    Write-Host -NoNewline "agentmemory slots... "
+    try {
+        $result = Invoke-RestMethod -Uri "http://localhost:3111/agentmemory/slots" -Method Get -TimeoutSec 5
+        if ($result.success -and $null -ne $result.slots) {
+            Write-Host "OK ($($result.slots.Count) slots)" -ForegroundColor Green
+            return
+        }
+    } catch {}
+
+    Write-Host "FAIL" -ForegroundColor Red
+    $script:errors += "agentmemory slots endpoint failed; restart with AGENTMEMORY_SLOTS=true"
+}
+
 Test-Port -Name "agentmemory" -Port 3111 -Required
 Test-Port -Name "agentmemory viewer" -Port 3113
-Test-Port -Name "PixelCat" -Port 8990
+Test-AgentMemorySlots
+Test-Port -Name "PixelCat for Claude" -Port 8990 -Required
 Test-Port -Name "key rotator" -Port 9100
 
 Write-Host -NoNewline "Agent Hub retired... "
@@ -61,7 +76,7 @@ foreach ($j in $junctions) {
 if ($jOk) { Write-Host "OK" -ForegroundColor Green } else { Write-Host "WARN" -ForegroundColor Yellow }
 
 Write-Host -NoNewline "CLI launchers... "
-$launchers = @("D:\devtools\cc.cmd", "D:\devtools\claude.cmd", "D:\devtools\codex.cmd", "D:\devtools\agentmemory-server.cmd")
+$launchers = @("D:\devtools\cc.cmd", "D:\devtools\claude.cmd", "D:\devtools\codex.cmd", "D:\devtools\agentmemory-server.cmd", "D:\devtools\pixelcat.cmd")
 $lOk = $true
 foreach ($l in $launchers) {
     if (-not (Test-Path $l)) {

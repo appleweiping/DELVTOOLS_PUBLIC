@@ -35,7 +35,7 @@ This is not a full copy of a machine. It intentionally excludes private agent ho
 
 | Path | Purpose |
 | --- | --- |
-| `agentmemory-server.ps1` / `.cmd` | Starts local agentmemory on demand. |
+| `agentmemory-server.ps1` / `.cmd` | Starts local agentmemory with all tools and slots enabled on demand. |
 | `health-check.ps1` | Read-only infrastructure check for agentmemory, launchers, D-drive junctions, and skill paths. |
 | `codex-health.ps1` | Read-only performance and process-family report. |
 | `codex-agent-report.ps1` | Read-only long-lived agent/process triage with command-line redaction. |
@@ -48,7 +48,7 @@ This is not a full copy of a machine. It intentionally excludes private agent ho
 | --- | --- | --- |
 | `agentmemory` | `http://localhost:3111` | Persistent memory, recall, signals, actions, and checkpoints. |
 | agentmemory viewer | `http://localhost:3113` | Optional local visual memory viewer. |
-| PixelCat | `127.0.0.1:8990` | Optional local Claude-compatible proxy for CC-family tools. |
+| PixelCat | `127.0.0.1:8990` | Always-on local Claude-compatible proxy for CC-family tools while using Claude. |
 | key rotator | `127.0.0.1:9100` | Optional local OpenAI-compatible key/proxy helper. |
 
 Agent Hub is retired and is not part of the active architecture.
@@ -71,7 +71,7 @@ powershell D:\devtools\agentmemory-server.ps1
 powershell D:\devtools\health-check.ps1
 ```
 
-If `memory_slot_list` returns HTTP 500 while the rest of agentmemory is healthy, treat slot APIs as unavailable and coordinate through normal memory, signals, actions, checkpoints, git state, and explicit context packs until the slot endpoint is fixed.
+Slots require `AGENTMEMORY_SLOTS=true` at service startup. If `memory_slot_list` returns HTTP 500 while the rest of agentmemory is healthy, restart the service with that environment flag; until then, coordinate through normal memory, signals, actions, checkpoints, git state, and explicit context packs.
 
 ## Public-Safety Rules
 
@@ -90,6 +90,19 @@ rg -n --hidden -S "sk-|api[_-]?key|token|secret|password|BEGIN .*PRIVATE KEY" .
 ```
 
 Treat every hit as suspicious until reviewed. Placeholder examples are okay; real keys must be removed and rotated.
+
+This repo also ships a stricter reusable gate:
+
+```powershell
+powershell .\tools\Test-PublicSafety.ps1
+powershell .\tools\Test-PublicSafety.ps1 -Path D:\agent-resources
+```
+
+For rotation steps, see [`docs/credential-rotation-runbook.md`](docs/credential-rotation-runbook.md).
+
+For agent collaboration examples, see [`examples/agentmemory-coordination.md`](examples/agentmemory-coordination.md).
+
+For the private/public split, see [`docs/private-devtools-hygiene.md`](docs/private-devtools-hygiene.md).
 
 ## Related
 
