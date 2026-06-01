@@ -102,7 +102,9 @@ This repo also ships a stricter reusable gate:
 
 ```powershell
 powershell .\tools\Test-PublicSafety.ps1
+powershell .\tools\Test-HistorySafety.ps1
 powershell .\tools\Test-PublicSafety.ps1 -Path D:\agent-resources
+powershell .\tools\Test-HistorySafety.ps1 -Path D:\agent-resources
 ```
 
 For rotation steps, see [`docs/credential-rotation-runbook.md`](docs/credential-rotation-runbook.md).

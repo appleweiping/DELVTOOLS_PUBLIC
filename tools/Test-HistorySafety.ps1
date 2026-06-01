@@ -14,8 +14,13 @@ $allowedPlaceholders = @(
 
 Push-Location $resolved
 try {
-    $raw = @(rg -n -I --pcre2 --with-filename --no-heading $pattern . 2>$null)
-    $hits = @()
+    git rev-parse --is-inside-work-tree *> $null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Not a git repository: $resolved"
+    }
+
+    $raw = @(git log -p --all -G $pattern -- . 2>$null)
+    $findings = @()
     foreach ($line in $raw) {
         foreach ($match in [regex]::Matches($line, $pattern)) {
             $value = $match.Value
@@ -27,16 +32,16 @@ try {
             } else {
                 "[redacted]"
             }
-            $hits += $line.Replace($value, $redacted)
+            $findings += $line.Replace($value, $redacted)
         }
     }
 
-    if ($hits.Count -gt 0) {
-        $hits | Select-Object -First 80
-        throw "Strict public-safety scan failed in $resolved"
+    if ($findings.Count -gt 0) {
+        $findings | Select-Object -First 80
+        throw "History safety scan failed in $resolved"
     }
 
-    Write-Host "Strict public-safety scan passed: $resolved" -ForegroundColor Green
+    Write-Host "History safety scan passed: $resolved" -ForegroundColor Green
 } finally {
     Pop-Location
 }
