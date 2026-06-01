@@ -1,0 +1,48 @@
+# Local secrets and machine state
+.env
+*.env
+*.local
+*.local.*
+*.local.cmd
+*.secret
+*.secrets
+secrets/
+
+# Runtime state
+logs/
+cache/
+tmp/
+sessions/
+state/
+history.jsonl
+*.log
+*.jsonl
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# Agent homes and bulky runtimes
+codex/
+claude/
+opencode/
+openhands/
+node/
+npm-global/
+npm-cache/
+dotnet/
+pwsh/
+bundle/
+uv-cache/
+uv-venv/
+plugins/
+vendor/
+
+# Binaries and generated artifacts
+*.exe
+*.dll
+*.msix
+*.zip
+generated_images/
+browser-profiles/
+model-cache/

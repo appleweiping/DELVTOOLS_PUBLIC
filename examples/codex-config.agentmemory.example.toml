@@ -1,0 +1,14 @@
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+
+[mcp_servers]
+
+[mcp_servers.agentmemory]
+type = "stdio"
+command = "npx"
+args = ["-y", "@agentmemory/mcp"]
+env_vars = ["AGENTMEMORY_URL=http://localhost:3111"]
+startup_timeout_sec = 15
+tool_timeout_sec = 120
+
+# Add optional MCP servers below. Do not add Agent Hub; it is retired.
