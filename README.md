@@ -39,6 +39,8 @@ This is not a full copy of a machine. It intentionally excludes private agent ho
 | `health-check.ps1` | Read-only infrastructure check for agentmemory, launchers, D-drive junctions, and skill paths. |
 | `codex-health.ps1` | Read-only performance and process-family report. |
 | `codex-agent-report.ps1` | Read-only long-lived agent/process triage with command-line redaction. |
+| `tools/Test-PrePushSafety.ps1` | Unified tracked/staged/history safety gate for public pushes. |
+| `tools/Install-PrePushHook.ps1` | Installs the local Git `pre-push` hook that calls the safety gate. |
 | `launchers/` | Public-safe launcher templates for Codex, Claude Code, ARIS, and supporting services. |
 | `examples/` | Local secret templates and MCP/config examples. |
 
@@ -103,9 +105,15 @@ This repo also ships a stricter reusable gate:
 ```powershell
 powershell .\tools\Test-PublicSafety.ps1
 powershell .\tools\Test-HistorySafety.ps1
+powershell .\tools\Test-PrePushSafety.ps1
+powershell .\tools\Install-PrePushHook.ps1
 powershell .\tools\Test-PublicSafety.ps1 -Path D:\agent-resources
 powershell .\tools\Test-HistorySafety.ps1 -Path D:\agent-resources
 ```
+
+The pre-push hook is intentionally installed locally rather than tracked as `.git/hooks/pre-push`. Re-run `tools\Install-PrePushHook.ps1` after cloning if this repository will publish changes.
+
+`v0.1.0-public-clean` marks the first scanned public-clean baseline tag.
 
 For rotation steps, see [`docs/credential-rotation-runbook.md`](docs/credential-rotation-runbook.md).
 
