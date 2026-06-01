@@ -71,6 +71,8 @@ powershell D:\devtools\agentmemory-server.ps1
 powershell D:\devtools\health-check.ps1
 ```
 
+If `memory_slot_list` returns HTTP 500 while the rest of agentmemory is healthy, treat slot APIs as unavailable and coordinate through normal memory, signals, actions, checkpoints, git state, and explicit context packs until the slot endpoint is fixed.
+
 ## Public-Safety Rules
 
 Do not commit:
