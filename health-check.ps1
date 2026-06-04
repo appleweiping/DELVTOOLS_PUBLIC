@@ -1,6 +1,10 @@
 # Agent infrastructure health check.
 # Read-only. Run: powershell D:\devtools\health-check.ps1
 
+param(
+    [switch]$RequirePixelCat
+)
+
 $errors = @()
 $warnings = @()
 
@@ -77,7 +81,12 @@ Test-Port -Name "agentmemory viewer" -Port 3113
 Test-AgentMemorySlots
 Test-AgentMemoryMcpTools
 Test-AgentMemoryEnginePath
-Test-Port -Name "PixelCat for Claude" -Port 8990 -Required
+$pixelCatIsRequired = $RequirePixelCat -or $env:DEVTOOLS_REQUIRE_PIXELCAT -eq "1" -or $env:DEVTOOLS_MODE -eq "cc"
+if ($pixelCatIsRequired) {
+    Test-Port -Name "PixelCat for Claude" -Port 8990 -Required
+} else {
+    Test-Port -Name "PixelCat for Claude" -Port 8990
+}
 Test-Port -Name "key rotator" -Port 9100
 
 Write-Host -NoNewline "Agent Hub retired... "

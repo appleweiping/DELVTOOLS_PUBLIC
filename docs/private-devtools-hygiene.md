@@ -4,7 +4,7 @@
 
 ## Public Pattern
 
-Use `devtools-public` as the open-source template:
+Use `DELVTOOLS_PUBLIC` / `devtools-public` as the open-source template:
 
 - stable launchers
 - read-only health checks
@@ -19,6 +19,7 @@ Use `devtools-public` as the open-source template:
 - Do not force-push or rewrite private history casually.
 - When a public artifact is useful, copy or recreate only the safe subset in `devtools-public`.
 - If private history must be cleaned, create a written plan first: affected refs, backup branch, secret rotation status, and rollback path.
+- WEIPING maintenance may summarize private `D:\devtools` purpose, script names, and validation commands, but it must not depend on raw Codex configs, automation prompt bodies, logs, DBs, caches, or local `memory.md`.
 
 ## Local Cleanup Order
 

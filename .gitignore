@@ -30,13 +30,16 @@ openhands/
 node/
 npm-global/
 npm-cache/
+pip-cache/
 dotnet/
 pwsh/
 bundle/
+ngspice/
 uv-cache/
 uv-venv/
 plugins/
 vendor/
+codex/tmp/
 
 # Binaries and generated artifacts
 *.exe

@@ -62,4 +62,5 @@ Invoke-RestMethod -Method Post `
 - Use actions for shared work queues.
 - Use checkpoints for release gates and irreversible decisions. Valid checkpoint types include `ci`, `approval`, `deploy`, `external`, and `timer`.
 - Use git status and explicit context packs as evidence.
+- Keep public examples independent of private `D:\devtools` configs, automation prompt bodies, logs, DBs, caches, and local memory files.
 - Do not revive Agent Hub queues or `hub_*` tools.
