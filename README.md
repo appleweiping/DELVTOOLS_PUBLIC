@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="banner.png" alt="devtools-public" width="100%">
+  <img src="banner.png" alt="DELVTOOLS_PUBLIC" width="100%">
 </p>
 
-<h1 align="center">devtools-public</h1>
+<h1 align="center">DELVTOOLS_PUBLIC</h1>
 
 <p align="center">
   <strong>Public-safe Windows agent workstation scripts for a D-drive-first, agentmemory-first setup.</strong>
