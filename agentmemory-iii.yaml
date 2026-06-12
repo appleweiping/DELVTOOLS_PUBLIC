@@ -1,0 +1,75 @@
+﻿# agentmemory canonical iii config (upgrade-immune, 2026-06-12)
+#
+# WHY THIS FILE EXISTS: the previous authority was
+#   D:\devtools\npm-global\node_modules\@agentmemory\agentmemory\dist\iii-config.yaml
+# which lives INSIDE the npm package. Every `npm update` rewrote it back to
+# relative paths (./data, node dist/index.mjs). With iii's cwd locked at
+# D:\devtools those relative exec/watch paths resolve to nothing, the watcher
+# fails, the exec child never starts, and every /agentmemory/* call hangs.
+# That was the recurring "port alive / app dead" outage (2026-06-10, 06-12).
+#
+# This file lives OUTSIDE the package, uses absolute paths only, and is what
+# agentmemory-server.ps1 passes to iii.exe via --config. npm upgrades can no
+# longer reset it. The watch entry points at the built index.mjs, so an npm
+# upgrade that rewrites the file automatically restarts the exec child on the
+# new code.
+#
+# Hot reload: iii watches THIS file; selfheal appends a "# selfheal-reload:"
+# marker line to force an engine reload without killing the process.
+
+workers:
+  - name: iii-http
+    config:
+      port: 3111
+      host: 127.0.0.1
+      default_timeout: 180000
+      cors:
+        allowed_origins: ["http://localhost:3111", "http://localhost:3113", "http://127.0.0.1:3111", "http://127.0.0.1:3113"]
+        allowed_methods: [GET, POST, PUT, DELETE, OPTIONS]
+  - name: iii-state
+    config:
+      adapter:
+        name: kv
+        config:
+          store_method: file_based
+          file_path: D:/devtools/data/state_store.db
+  - name: iii-queue
+    config:
+      adapter:
+        name: builtin
+  - name: iii-pubsub
+    config:
+      adapter:
+        name: local
+  - name: iii-cron
+    config:
+      adapter:
+        name: kv
+  - name: iii-stream
+    config:
+      port: 3112
+      host: 127.0.0.1
+      adapter:
+        name: kv
+        config:
+          store_method: file_based
+          file_path: D:/devtools/data/stream_store
+  - name: iii-observability
+    config:
+      enabled: true
+      service_name: agentmemory
+      exporter: memory
+      # 0.1 sampling: full sampling under load makes the log subscriber lag,
+      # the lag WARN re-enters the stream it cannot drain, and the feedback
+      # loop once wrote 137 GB of logs (upstream #519). Keep at 0.1.
+      sampling_ratio: 0.1
+      metrics_enabled: true
+      logs_enabled: true
+      logs_console_output: false
+  - name: iii-exec
+    config:
+      watch:
+        - D:/devtools/npm-global/node_modules/@agentmemory/agentmemory/dist/index.mjs
+      exec:
+        - node D:/devtools/npm-global/node_modules/@agentmemory/agentmemory/dist/index.mjs
+# selfheal-reload: 2026-06-12 12:24:34

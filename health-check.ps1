@@ -1,4 +1,4 @@
-# Agent infrastructure health check.
+﻿# Agent infrastructure health check.
 # Read-only. Run: powershell D:\devtools\health-check.ps1
 
 param(
