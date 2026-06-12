@@ -19,7 +19,12 @@ try {
         throw "Not a git repository: $resolved"
     }
 
-    $raw = @(git log -p --all -G $pattern -- . 2>$null)
+    # Local EAP guard: under EAP='Stop', git's stderr (redirected via 2>$null)
+    # would raise a terminating NativeCommandError on any warning and abort the
+    # history scan. Drop EAP only around the native call.
+    $prevEap = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    try { $raw = @(git log -p --all -G $pattern -- . 2>$null) }
+    finally { $ErrorActionPreference = $prevEap }
     $findings = @()
     foreach ($line in $raw) {
         foreach ($match in [regex]::Matches($line, $pattern)) {

@@ -107,7 +107,9 @@ if (Test-Path "D:\agent-resources\SKILL-INDEX.md") {
 }
 
 Write-Host -NoNewline "D-drive junctions... "
-$junctions = @("C:\Users\admin\.claude", "C:\Users\admin\.codex")
+# Derive from USERPROFILE so this is portable and the public export carries no
+# literal username (2026-06-12).
+$junctions = @("$env:USERPROFILE\.claude", "$env:USERPROFILE\.codex")
 $jOk = $true
 foreach ($j in $junctions) {
     $item = Get-Item $j -Force -ErrorAction SilentlyContinue
@@ -130,7 +132,10 @@ foreach ($l in $launchers) {
 if ($lOk) { Write-Host "OK" -ForegroundColor Green } else { Write-Host "WARN" -ForegroundColor Yellow }
 
 Write-Host -NoNewline "Codex ARIS skills... "
-$codexSkills = Get-ChildItem "D:\research\Vipin's Knowledgebase\.codex\skills\aris-*" -Directory -ErrorAction SilentlyContinue
+# Set DEVTOOLS_ARIS_SKILL_ROOT to wherever your Codex ARIS skills live; the
+# default below is a neutral example path (no personal/private repo names).
+$arisSkillRoot = if ($env:DEVTOOLS_ARIS_SKILL_ROOT) { $env:DEVTOOLS_ARIS_SKILL_ROOT } else { "D:\agent-resources\.codex\skills" }
+$codexSkills = Get-ChildItem (Join-Path $arisSkillRoot "aris-*") -Directory -ErrorAction SilentlyContinue
 if ($codexSkills.Count -ge 8) {
     Write-Host "OK ($($codexSkills.Count) skills)" -ForegroundColor Green
 } else {

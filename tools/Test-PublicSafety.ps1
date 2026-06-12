@@ -14,7 +14,12 @@ $allowedPlaceholders = @(
 
 Push-Location $resolved
 try {
-    $raw = @(rg -n -I --pcre2 --with-filename --no-heading $pattern . 2>$null)
+    # Local EAP guard: under EAP='Stop', rg's stderr (permission-denied / broken
+    # symlink notes, redirected via 2>$null) would raise a terminating
+    # NativeCommandError and abort the scan. Drop EAP only around the native call.
+    $prevEap = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+    try { $raw = @(rg -n -I --pcre2 --with-filename --no-heading $pattern . 2>$null) }
+    finally { $ErrorActionPreference = $prevEap }
     $hits = @()
     foreach ($line in $raw) {
         foreach ($match in [regex]::Matches($line, $pattern)) {

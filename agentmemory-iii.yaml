@@ -1,4 +1,4 @@
-﻿# agentmemory canonical iii config (upgrade-immune, 2026-06-12)
+# agentmemory canonical iii config (upgrade-immune, 2026-06-12)
 #
 # WHY THIS FILE EXISTS: the previous authority was
 #   D:\devtools\npm-global\node_modules\@agentmemory\agentmemory\dist\iii-config.yaml
@@ -72,4 +72,3 @@ workers:
         - D:/devtools/npm-global/node_modules/@agentmemory/agentmemory/dist/index.mjs
       exec:
         - node D:/devtools/npm-global/node_modules/@agentmemory/agentmemory/dist/index.mjs
-# selfheal-reload: 2026-06-12 12:24:34

@@ -16,18 +16,22 @@ $allowedPlaceholders = @(
 )
 $blockedPathPattern = '(^|/)(\.env|secrets?)(/|$)|^(logs?|cache|sessions?|state|runtime|runtimes|node_modules|npm-cache|uv-cache|uv-venv|browser-profiles|model-cache)(/|$)|\.(sqlite|sqlite-shm|sqlite-wal|db|log|pem|p12|pfx)$|(^|/).*\.(local|secret|secrets)(\.cmd|\.ps1|\.json|\.toml|\.env|$)'
 
-function Convert-ToRepoPath([string]$filePath) {
-    $full = [System.IO.Path]::GetFullPath((Join-Path $root $filePath))
-    $relative = [System.IO.Path]::GetRelativePath($root, $full)
-    return ($relative -replace '\\', '/')
-}
-
 function Invoke-GitLines([string[]]$arguments) {
-    $output = & git -C $root -c core.quotePath=false @arguments 2>$null
+    # PS 5.1 + EAP='Stop' turns a native command's redirected stderr into a
+    # terminating NativeCommandError, so a harmless git warning (e.g. CRLF
+    # 'LF will be replaced by CRLF') would crash this safety gate mid-scan.
+    # Drop EAP locally; only the exit-code check below decides success.
+    $prev = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = & git -C $root -c core.quotePath=false @arguments 2>&1
+    } finally {
+        $ErrorActionPreference = $prev
+    }
     if ($LASTEXITCODE -ne 0) {
         throw "git $($arguments -join ' ') failed in $root"
     }
-    return @($output)
+    return @($output | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] })
 }
 
 Invoke-GitLines @("rev-parse", "--is-inside-work-tree") *> $null
