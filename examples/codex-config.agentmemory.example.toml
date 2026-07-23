@@ -1,0 +1,15 @@
+model = "gpt-5.5"
+model_reasoning_effort = "high"
+
+[mcp_servers]
+
+[mcp_servers.agentmemory]
+command = 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', 'D:\devtools\agentmemory-mcp-dpapi.ps1', '-SettingsPath', 'D:\devtools\logs\agentmemory-watchdog.settings.port3111.taskREPLACE_WITH_TASK_KEY.json']
+# Replace the task-key placeholder with the ignored file created by watchdog
+# registration. The launcher supplies SECRET and URL only to the stdio child.
+env = { AGENTMEMORY_TOOLS = "all" }
+startup_timeout_sec = 60
+tool_timeout_sec = 120
+
+# Add optional MCP servers below. Do not add Agent Hub; it is retired.

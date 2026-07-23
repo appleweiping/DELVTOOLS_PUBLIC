@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "agentmemory": {
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "D:\\devtools\\agentmemory-mcp-dpapi.ps1",
+        "-SettingsPath",
+        "D:\\devtools\\logs\\agentmemory-watchdog.settings.port3111.taskREPLACE_WITH_TASK_KEY.json"
+      ],
+      "env": {
+        "AGENTMEMORY_TOOLS": "all"
+      }
+    }
+  }
+}

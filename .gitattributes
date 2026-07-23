@@ -1,0 +1,17 @@
+* text=auto
+
+# Windows command files must remain CRLF without a byte-order mark.
+*.cmd text eol=crlf
+
+# PowerShell and documentation are normalized for deterministic reviews.
+*.ps1 text eol=crlf
+*.md text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+*.png binary
+*.gif binary
+*.jpg binary
+*.jpeg binary

@@ -1,0 +1,135 @@
+name: Public safety
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-history-safety:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout complete parent history without dependencies
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          lfs: false
+          persist-credentials: false
+          submodules: false
+
+      - name: Use the pinned Node.js runtime
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.21.1
+
+      - name: Verify Node.js and npm versions
+        shell: powershell
+        run: |
+          if ((node --version).Trim() -ne 'v22.21.1') { throw 'Unexpected Node.js version' }
+          if ((npm --version).Trim() -ne '10.9.4') { throw 'Unexpected npm version' }
+
+      - name: Test key rotator behavior
+        shell: powershell
+        run: node --test .\tests\key-rotator.test.mjs
+
+      - name: Test authenticated AgentMemory Host guard
+        shell: powershell
+        run: node --test .\tests\agentmemory-host-guard.test.mjs
+
+      - name: Test AgentMemory runtime supervisor
+        shell: powershell
+        run: node --test .\tests\agentmemory-runtime-supervisor.test.mjs
+
+      - name: Validate the pinned AgentMemory dependency closure
+        shell: powershell
+        run: node --test .\tests\security\agentmemory-dependency-lock.test.mjs
+
+      - name: Test runtime scripts in Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $pester = @(Import-Module Pester -RequiredVersion 3.4.0 -Force -PassThru)
+          if ($pester.Count -ne 1 -or $pester[0].Version.ToString() -ne '3.4.0') { throw 'Unexpected Pester version' }
+          $result = Invoke-Pester .\tests\core\RuntimeScripts.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Test runtime scripts in PowerShell 7
+        shell: pwsh
+        run: |
+          $pester = @(Import-Module Pester -RequiredVersion 3.4.0 -Force -PassThru)
+          if ($pester.Count -ne 1 -or $pester[0].Version.ToString() -ne '3.4.0') { throw 'Unexpected Pester version' }
+          $result = Invoke-Pester .\tests\core\RuntimeScripts.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Test watchdog persistence in Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $pester = @(Import-Module Pester -RequiredVersion 3.4.0 -Force -PassThru)
+          if ($pester.Count -ne 1 -or $pester[0].Version.ToString() -ne '3.4.0') { throw 'Unexpected Pester version' }
+          $result = Invoke-Pester .\tests\core\WatchdogPersistence.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Test watchdog persistence in PowerShell 7
+        shell: pwsh
+        run: |
+          $pester = @(Import-Module Pester -RequiredVersion 3.4.0 -Force -PassThru)
+          if ($pester.Count -ne 1 -or $pester[0].Version.ToString() -ne '3.4.0') { throw 'Unexpected Pester version' }
+          $result = Invoke-Pester .\tests\core\WatchdogPersistence.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Test DPAPI AgentMemory MCP launcher in Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $pester = @(Import-Module Pester -RequiredVersion 3.4.0 -Force -PassThru)
+          if ($pester.Count -ne 1 -or $pester[0].Version.ToString() -ne '3.4.0') { throw 'Unexpected Pester version' }
+          $result = Invoke-Pester .\tests\core\McpDpapiLauncher.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Test DPAPI AgentMemory MCP launcher in PowerShell 7
+        shell: pwsh
+        run: |
+          $pester = @(Import-Module Pester -RequiredVersion 3.4.0 -Force -PassThru)
+          if ($pester.Count -ne 1 -or $pester[0].Version.ToString() -ne '3.4.0') { throw 'Unexpected Pester version' }
+          $result = Invoke-Pester .\tests\core\McpDpapiLauncher.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Test launcher templates
+        shell: powershell
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\launchers\Test-LauncherTemplates.ps1
+
+      - name: Test shell reachability without persistence
+        shell: powershell
+        run: |
+          $pester = @(Import-Module Pester -RequiredVersion 3.4.0 -Force -PassThru)
+          if ($pester.Count -ne 1 -or $pester[0].Version.ToString() -ne '3.4.0') { throw 'Unexpected Pester version' }
+          $result = Invoke-Pester .\tests\shell\ShellReachability.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+
+      - name: Test derived-memory promotion
+        shell: powershell
+        run: |
+          $pester = @(Import-Module Pester -RequiredVersion 3.4.0 -Force -PassThru)
+          if ($pester.Count -ne 1 -or $pester[0].Version.ToString() -ne '3.4.0') { throw 'Unexpected Pester version' }
+          $result = Invoke-Pester .\tests\memory\IngestLessonsWrapper.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { exit 1 }
+          node --test .\tests\memory\ingest-lessons.test.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run security regression tests in Windows PowerShell 5.1
+        shell: powershell
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\security\Test-PublicSafetyGates.ps1
+
+      - name: Scan current public surface
+        shell: powershell
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\Test-PublicSafety.ps1
+
+      - name: Scan every reachable historical blob
+        shell: powershell
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\Test-HistorySafety.ps1
+
+      - name: Run unified pre-push policy
+        shell: powershell
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tools\Test-PrePushSafety.ps1
