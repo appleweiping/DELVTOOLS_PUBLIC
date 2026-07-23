@@ -257,7 +257,18 @@ function Invoke-McpLauncherExternalBytes {
     }
 }
 
+function Get-McpLauncherTestNode {
+    $nodes = @(Get-Command node.exe -CommandType Application -ErrorAction Stop)
+    if ($nodes.Count -lt 1) {
+        throw 'Node test runtime is unavailable.'
+    }
+
+    return [System.IO.Path]::GetFullPath([string]$nodes[0].Source)
+}
+
 Describe 'AgentMemory MCP DPAPI launcher' {
+    $TestDrive = [System.IO.Path]::GetFullPath([string]$TestDrive)
+
     BeforeEach {
         $script:originalAgentMemorySecret =
             [Environment]::GetEnvironmentVariable('AGENTMEMORY_SECRET', 'Process')
@@ -306,7 +317,7 @@ Describe 'AgentMemory MCP DPAPI launcher' {
         $fixture = New-McpLauncherFixture `
             -Root (Join-Path $TestDrive 'external-interactive') `
             -Secret ('A1b2C3d4_' * 4)
-        $nodeExecutable = (Get-Command node.exe -CommandType Application -ErrorAction Stop).Source
+        $nodeExecutable = Get-McpLauncherTestNode
         $fixture.Settings.NodeExecutable = $nodeExecutable
         Write-McpLauncherSettings `
             -Path $fixture.SettingsPath `
@@ -368,7 +379,7 @@ process.stdin.on('end', () => {
         $fixture = New-McpLauncherFixture `
             -Root (Join-Path $TestDrive 'external-stdio') `
             -Secret $secret
-        $nodeExecutable = (Get-Command node.exe -CommandType Application -ErrorAction Stop).Source
+        $nodeExecutable = Get-McpLauncherTestNode
         $fixture.Settings.NodeExecutable = $nodeExecutable
         Write-McpLauncherSettings `
             -Path $fixture.SettingsPath `
@@ -446,7 +457,7 @@ process.exitCode = 37;
         $fixture = New-McpLauncherFixture `
             -Root (Join-Path $TestDrive 'external-early-exit') `
             -Secret ('A1b2C3d4_' * 4)
-        $nodeExecutable = (Get-Command node.exe -CommandType Application -ErrorAction Stop).Source
+        $nodeExecutable = Get-McpLauncherTestNode
         $fixture.Settings.NodeExecutable = $nodeExecutable
         Write-McpLauncherSettings `
             -Path $fixture.SettingsPath `
